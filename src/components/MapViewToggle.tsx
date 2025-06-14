@@ -5,7 +5,7 @@ import { Badge } from '@/components/ui/badge';
 import { 
   Map, 
   Users, 
-  Traffic, 
+  CircleArrowUp,
   Eye,
   BarChart3,
   Navigation
@@ -21,7 +21,7 @@ export const MapViewToggle = ({ mapView, setMapView }: MapViewToggleProps) => {
     {
       id: 'congestion',
       label: 'Congestion View',
-      icon: Traffic,
+      icon: CircleArrowUp,
       description: 'Color-coded traffic congestion levels',
       color: 'bg-red-500'
     },
