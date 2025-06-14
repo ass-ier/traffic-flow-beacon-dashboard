@@ -1,5 +1,7 @@
 
-import { TileLayer, Circle, Polyline, Popup } from 'react-leaflet';
+import { TileLayer, Circle, Polyline, Popup, Marker } from 'react-leaflet';
+import { divIcon } from 'leaflet';
+import { Plus, Flame, Shield } from 'lucide-react';
 
 interface EmergencyVehicle {
   id: number;
@@ -38,6 +40,7 @@ interface MapLayersProps {
   emergencyVehicles: EmergencyVehicle[];
   onIntersectionSelect: (intersection: any) => void;
   onEmergencyVehicleSelect: (vehicle: EmergencyVehicle) => void;
+  onTrafficLightOverride: (intersectionId: number) => void;
 }
 
 const getCongestionColor = (level: string) => {
@@ -55,12 +58,51 @@ const getTrafficLightColor = (phase: string) => {
   return '#f59e0b';
 };
 
-const getEmergencyVehicleColor = (type: string, priority: string) => {
-  if (priority === 'high') return '#dc2626';
-  if (type === 'ambulance') return '#ef4444';
-  if (type === 'police') return '#3b82f6';
-  if (type === 'fire') return '#f97316';
-  return '#6b7280';
+const createEmergencyVehicleIcon = (type: string) => {
+  const iconSvg = type === 'ambulance' 
+    ? `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+         <circle cx="12" cy="12" r="10" fill="#dc2626" stroke="#fff" stroke-width="2"/>
+         <path d="M12 6v12M6 12h12" stroke="#fff" stroke-width="2" stroke-linecap="round"/>
+       </svg>`
+    : type === 'fire'
+    ? `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+         <circle cx="12" cy="12" r="10" fill="#f97316" stroke="#fff" stroke-width="2"/>
+         <path d="M8.5 14.5A4.5 4.5 0 0 0 12 18.5a4.5 4.5 0 0 0 3.5-4.5 3.5 3.5 0 0 0-2-3 1.5 1.5 0 0 0-1.5 1.5A1.5 1.5 0 0 1 10.5 11a3.5 3.5 0 0 0-2 3.5Z" fill="#fff"/>
+       </svg>`
+    : `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+         <circle cx="12" cy="12" r="10" fill="#3b82f6" stroke="#fff" stroke-width="2"/>
+         <path d="M9 12l2 2 4-4" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+         <path d="M12 1v6M12 17v6M4.22 4.22l4.24 4.24M15.54 15.54l4.24 4.24M1 12h6M17 12h6M4.22 19.78l4.24-4.24M15.54 8.46l4.24-4.24" stroke="#fff" stroke-width="1" stroke-linecap="round"/>
+       </svg>`;
+
+  return divIcon({
+    html: iconSvg,
+    className: 'custom-emergency-icon',
+    iconSize: [24, 24],
+    iconAnchor: [12, 12]
+  });
+};
+
+const createTrafficLightIcon = (phase: string) => {
+  const redActive = phase === 'red';
+  const yellowActive = phase.includes('yellow');
+  const greenActive = phase.includes('green');
+
+  const trafficLightSvg = `
+    <svg width="32" height="48" viewBox="0 0 32 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <rect x="4" y="4" width="24" height="40" rx="4" fill="#2d3748" stroke="#000" stroke-width="2"/>
+      <circle cx="16" cy="12" r="5" fill="${redActive ? '#dc2626' : '#4a5568'}" stroke="#000"/>
+      <circle cx="16" cy="24" r="5" fill="${yellowActive ? '#f59e0b' : '#4a5568'}" stroke="#000"/>
+      <circle cx="16" cy="36" r="5" fill="${greenActive ? '#10b981' : '#4a5568'}" stroke="#000"/>
+    </svg>
+  `;
+
+  return divIcon({
+    html: trafficLightSvg,
+    className: 'custom-traffic-light',
+    iconSize: [32, 48],
+    iconAnchor: [16, 24]
+  });
 };
 
 export const MapLayers = ({ 
@@ -70,7 +112,8 @@ export const MapLayers = ({
   vehicles, 
   emergencyVehicles,
   onIntersectionSelect,
-  onEmergencyVehicleSelect 
+  onEmergencyVehicleSelect,
+  onTrafficLightOverride 
 }: MapLayersProps) => {
   return (
     <>
@@ -116,21 +159,12 @@ export const MapLayers = ({
         </Polyline>
       ))}
 
-      {/* Intersections */}
+      {/* Traffic Light Intersections */}
       {intersections.map(intersection => (
-        <Circle
+        <Marker
           key={intersection.id}
-          center={[intersection.lat, intersection.lng]}
-          radius={50}
-          color={mapView === 'traffic-lights' ? 
-            getTrafficLightColor(intersection.phase) : 
-            getCongestionColor(intersection.congestionLevel)
-          }
-          fillColor={mapView === 'traffic-lights' ? 
-            getTrafficLightColor(intersection.phase) : 
-            getCongestionColor(intersection.congestionLevel)
-          }
-          fillOpacity={0.7}
+          position={[intersection.lat, intersection.lng]}
+          icon={createTrafficLightIcon(intersection.phase)}
           eventHandlers={{
             click: () => onIntersectionSelect(intersection)
           }}
@@ -149,48 +183,22 @@ export const MapLayers = ({
                 View Details
               </button>
               <button 
-                className="bg-red-500 text-white px-2 py-1 rounded text-xs hover:bg-red-600"
-                onClick={() => {
-                  console.log(`Emergency override for intersection ${intersection.id}`);
-                }}
+                className="bg-green-500 text-white px-2 py-1 rounded text-xs hover:bg-green-600"
+                onClick={() => onTrafficLightOverride(intersection.id)}
               >
-                Emergency Override
+                Override to Green
               </button>
             </div>
           </Popup>
-        </Circle>
+        </Marker>
       ))}
 
-      {/* Regular vehicles */}
-      {vehicles.map(vehicle => (
-        <Circle
-          key={vehicle.id}
-          center={[vehicle.lat, vehicle.lng]}
-          radius={15}
-          color={vehicle.speed > 20 ? '#10b981' : vehicle.speed > 5 ? '#f59e0b' : '#dc2626'}
-          fillColor={vehicle.speed > 20 ? '#10b981' : vehicle.speed > 5 ? '#f59e0b' : '#dc2626'}
-          fillOpacity={0.8}
-        >
-          <Popup>
-            <div>
-              <strong>{vehicle.type.toUpperCase()} {vehicle.id}</strong><br />
-              Speed: {Math.round(vehicle.speed)} km/h<br />
-              Status: {vehicle.speed > 20 ? 'Moving' : vehicle.speed > 5 ? 'Slow' : 'Stopped'}
-            </div>
-          </Popup>
-        </Circle>
-      ))}
-
-      {/* Emergency vehicles */}
+      {/* Emergency vehicles only */}
       {emergencyVehicles.map(vehicle => (
-        <Circle
+        <Marker
           key={`emergency-${vehicle.id}`}
-          center={[vehicle.lat, vehicle.lng]}
-          radius={25}
-          color={getEmergencyVehicleColor(vehicle.type, vehicle.priority)}
-          fillColor={getEmergencyVehicleColor(vehicle.type, vehicle.priority)}
-          fillOpacity={0.9}
-          weight={3}
+          position={[vehicle.lat, vehicle.lng]}
+          icon={createEmergencyVehicleIcon(vehicle.type)}
           eventHandlers={{
             click: () => onEmergencyVehicleSelect(vehicle)
           }}
@@ -213,7 +221,7 @@ export const MapLayers = ({
               </button>
             </div>
           </Popup>
-        </Circle>
+        </Marker>
       ))}
     </>
   );

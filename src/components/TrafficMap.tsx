@@ -150,6 +150,15 @@ export const TrafficMap = ({ mapView, simulationState }: TrafficMapProps) => {
     console.log('Selected emergency vehicle:', vehicle);
   };
 
+  const handleTrafficLightOverride = (intersectionId: number) => {
+    setIntersections(prev => prev.map(intersection => 
+      intersection.id === intersectionId 
+        ? { ...intersection, phase: 'green-ns' }
+        : intersection
+    ));
+    console.log(`Traffic light ${intersectionId} overridden to green`);
+  };
+
   return (
     <div className="h-full w-full relative">
       <MapContainer
@@ -167,6 +176,7 @@ export const TrafficMap = ({ mapView, simulationState }: TrafficMapProps) => {
           emergencyVehicles={emergencyVehicles}
           onIntersectionSelect={handleIntersectionSelect}
           onEmergencyVehicleSelect={handleEmergencyVehicleSelect}
+          onTrafficLightOverride={handleTrafficLightOverride}
         />
       </MapContainer>
 
@@ -174,6 +184,7 @@ export const TrafficMap = ({ mapView, simulationState }: TrafficMapProps) => {
       <IntersectionStatus 
         intersection={selectedIntersection}
         onClose={() => setSelectedIntersection(null)}
+        onOverrideToGreen={handleTrafficLightOverride}
       />
 
       {/* Emergency Vehicles Panel */}
@@ -222,7 +233,15 @@ export const TrafficMap = ({ mapView, simulationState }: TrafficMapProps) => {
         <div className="mt-3 pt-2 border-t space-y-1">
           <div className="flex items-center space-x-2">
             <div className="w-3 h-3 bg-red-600 rounded-full"></div>
-            <span>Emergency Vehicle</span>
+            <span>🚑 Ambulance</span>
+          </div>
+          <div className="flex items-center space-x-2">
+            <div className="w-3 h-3 bg-orange-600 rounded-full"></div>
+            <span>🚒 Fire Department</span>
+          </div>
+          <div className="flex items-center space-x-2">
+            <div className="w-3 h-3 bg-blue-600 rounded-full"></div>
+            <span>🚔 Police</span>
           </div>
         </div>
       </div>

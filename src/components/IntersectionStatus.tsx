@@ -7,7 +7,8 @@ import {
   Clock, 
   Users, 
   AlertTriangle,
-  X
+  X,
+  Zap
 } from 'lucide-react';
 
 interface IntersectionStatusProps {
@@ -21,6 +22,7 @@ interface IntersectionStatusProps {
     remainingTime?: number;
   } | null;
   onClose: () => void;
+  onOverrideToGreen: (intersectionId: number) => void;
 }
 
 const getPhaseColor = (phase: string) => {
@@ -36,7 +38,7 @@ const getPhaseText = (phase: string) => {
   return 'Yellow (Transition)';
 };
 
-export const IntersectionStatus = ({ intersection, onClose }: IntersectionStatusProps) => {
+export const IntersectionStatus = ({ intersection, onClose, onOverrideToGreen }: IntersectionStatusProps) => {
   if (!intersection) return null;
 
   return (
@@ -78,8 +80,18 @@ export const IntersectionStatus = ({ intersection, onClose }: IntersectionStatus
           </div>
         </div>
 
-        {/* Emergency Override */}
-        <div className="pt-3 border-t">
+        {/* Control Actions */}
+        <div className="pt-3 border-t space-y-2">
+          <Button 
+            variant="default" 
+            size="sm" 
+            className="w-full bg-green-600 hover:bg-green-700"
+            onClick={() => onOverrideToGreen(intersection.id)}
+          >
+            <Zap className="h-4 w-4 mr-2" />
+            Override to Green
+          </Button>
+          
           <Button 
             variant="destructive" 
             size="sm" 
