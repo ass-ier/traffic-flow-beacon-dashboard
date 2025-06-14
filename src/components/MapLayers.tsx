@@ -1,6 +1,17 @@
 
 import { TileLayer, Circle, Polyline, Popup } from 'react-leaflet';
 
+interface EmergencyVehicle {
+  id: number;
+  type: 'ambulance' | 'police' | 'fire';
+  lat: number;
+  lng: number;
+  speed: number;
+  status: 'responding' | 'on-scene' | 'returning';
+  priority: 'high' | 'medium' | 'low';
+  destination?: string;
+}
+
 interface MapLayersProps {
   mapView: string;
   sampleRoads: Array<{
@@ -24,6 +35,9 @@ interface MapLayersProps {
     speed: number;
     type: string;
   }>;
+  emergencyVehicles: EmergencyVehicle[];
+  onIntersectionSelect: (intersection: any) => void;
+  onEmergencyVehicleSelect: (vehicle: EmergencyVehicle) => void;
 }
 
 const getCongestionColor = (level: string) => {
@@ -41,7 +55,23 @@ const getTrafficLightColor = (phase: string) => {
   return '#f59e0b';
 };
 
-export const MapLayers = ({ mapView, sampleRoads, intersections, vehicles }: MapLayersProps) => {
+const getEmergencyVehicleColor = (type: string, priority: string) => {
+  if (priority === 'high') return '#dc2626';
+  if (type === 'ambulance') return '#ef4444';
+  if (type === 'police') return '#3b82f6';
+  if (type === 'fire') return '#f97316';
+  return '#6b7280';
+};
+
+export const MapLayers = ({ 
+  mapView, 
+  sampleRoads, 
+  intersections, 
+  vehicles, 
+  emergencyVehicles,
+  onIntersectionSelect,
+  onEmergencyVehicleSelect 
+}: MapLayersProps) => {
   return (
     <>
       <TileLayer
@@ -101,6 +131,9 @@ export const MapLayers = ({ mapView, sampleRoads, intersections, vehicles }: Map
             getCongestionColor(intersection.congestionLevel)
           }
           fillOpacity={0.7}
+          eventHandlers={{
+            click: () => onIntersectionSelect(intersection)
+          }}
         >
           <Popup>
             <div>
@@ -109,6 +142,12 @@ export const MapLayers = ({ mapView, sampleRoads, intersections, vehicles }: Map
               Light Phase: {intersection.phase}<br />
               Congestion: {intersection.congestionLevel}
               <br /><br />
+              <button 
+                className="bg-blue-500 text-white px-2 py-1 rounded text-xs hover:bg-blue-600 mr-2"
+                onClick={() => onIntersectionSelect(intersection)}
+              >
+                View Details
+              </button>
               <button 
                 className="bg-red-500 text-white px-2 py-1 rounded text-xs hover:bg-red-600"
                 onClick={() => {
@@ -122,7 +161,7 @@ export const MapLayers = ({ mapView, sampleRoads, intersections, vehicles }: Map
         </Circle>
       ))}
 
-      {/* Moving vehicles */}
+      {/* Regular vehicles */}
       {vehicles.map(vehicle => (
         <Circle
           key={vehicle.id}
@@ -137,6 +176,41 @@ export const MapLayers = ({ mapView, sampleRoads, intersections, vehicles }: Map
               <strong>{vehicle.type.toUpperCase()} {vehicle.id}</strong><br />
               Speed: {Math.round(vehicle.speed)} km/h<br />
               Status: {vehicle.speed > 20 ? 'Moving' : vehicle.speed > 5 ? 'Slow' : 'Stopped'}
+            </div>
+          </Popup>
+        </Circle>
+      ))}
+
+      {/* Emergency vehicles */}
+      {emergencyVehicles.map(vehicle => (
+        <Circle
+          key={`emergency-${vehicle.id}`}
+          center={[vehicle.lat, vehicle.lng]}
+          radius={25}
+          color={getEmergencyVehicleColor(vehicle.type, vehicle.priority)}
+          fillColor={getEmergencyVehicleColor(vehicle.type, vehicle.priority)}
+          fillOpacity={0.9}
+          weight={3}
+          eventHandlers={{
+            click: () => onEmergencyVehicleSelect(vehicle)
+          }}
+        >
+          <Popup>
+            <div>
+              <strong>{vehicle.type.toUpperCase()} {vehicle.id}</strong><br />
+              Status: {vehicle.status}<br />
+              Speed: {Math.round(vehicle.speed)} km/h<br />
+              Priority: {vehicle.priority}<br />
+              {vehicle.destination && (
+                <>Destination: {vehicle.destination}<br /></>
+              )}
+              <br />
+              <button 
+                className="bg-blue-500 text-white px-2 py-1 rounded text-xs hover:bg-blue-600"
+                onClick={() => onEmergencyVehicleSelect(vehicle)}
+              >
+                Track Vehicle
+              </button>
             </div>
           </Popup>
         </Circle>
