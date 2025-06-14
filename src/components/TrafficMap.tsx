@@ -113,7 +113,7 @@ export const TrafficMap = ({ mapView, simulationState }: TrafficMapProps) => {
   return (
     <div className="h-full w-full relative">
       <MapContainer
-        center={[9.0320, 38.7469]} // Addis Ababa coordinates
+        center={[9.0320, 38.7469]}
         zoom={15}
         className="h-full w-full"
         zoomControl={true}
