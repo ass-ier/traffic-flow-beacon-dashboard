@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://sumo.dlr.de/xsd/sumoConfiguration.xsd">
+    
+    <!-- Input files -->
+    <input>
+        <net-file value="AddisAbaba.net.xml"/>
+        <route-files value="routes.xml"/>
+        <additional-files value="vTypes.xml"/>
+    </input>
+    
+    <!-- Time settings for TraCI integration -->
+    <time>
+        <begin value="0"/>
+        <end value="10800"/> <!-- 3 hour simulation -->
+        <step-length value="1.0"/>
+    </time>
+    
+    <!-- TraCI server configuration -->
+    <traci_server>
+        <remote-port value="8813"/>
+    </traci_server>
+    
+    <!-- Processing settings to handle vehicles without explicit types -->
+    <processing>
+        <!-- Critical: Handle vehicles without type attribute -->
+        <ignore-route-errors value="true"/>
+        <default.speeddev value="0.1"/>
+        <default.action-step-length value="1.0"/>
+        
+        <!-- Route loading optimization -->
+        <route-steps value="500"/>
+        <max-depart-delay value="3600"/>
+        <eager-insert value="true"/>
+        <max-num-vehicles value="15000"/>
+        
+        <!-- Traffic flow optimization -->
+        <collision.check-junctions value="true"/>
+        <collision.action value="warn"/>
+        <time-to-teleport value="300"/>
+        <ignore-junction-blocker value="60"/>
+        <lateral-resolution value="0.8"/>
+        <ignore-accidents value="true"/>
+    </processing>
+    
+    <!-- GUI settings for manual control -->
+    <gui_only>
+        <start value="false"/>
+        <quit-on-end value="false"/>
+        <delay value="100"/>
+    </gui_only>
+    
+    <!-- Output settings for monitoring -->
+    <output>
+        <summary-output value="simulation_summary.xml"/>
+        <tripinfo-output value="trip_info.xml"/>
+        <fcd-output value="floating_car_data.xml"/>
+        <fcd-output.geo value="true"/>
+        <duration-log.statistics value="true"/>
+    </output>
+    
+    <!-- Reporting settings optimized for performance -->
+    <report>
+        <verbose value="false"/>
+        <no-step-log value="true"/>
+        <no-warnings value="true"/>
+        <log-file value="sumo_run.log"/>
+        <message-log value="sumo_messages.log"/>
+        <error-log value="sumo_errors.log"/>
+    </report>
+    
+    <!-- Random seed for reproducible results -->
+    <random_number>
+        <seed value="42"/>
+    </random_number>
+    
+</configuration>

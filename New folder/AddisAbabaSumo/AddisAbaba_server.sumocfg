@@ -1,0 +1,20 @@
+<configuration>
+    <input>
+        <net-file value="D:\Hilcoe\4th3rd\Senior_Project\Traffic_Management_System\traffic-flow-beacon-dashboard\traffic-flow-beacon-dashboard\AddisAbabaSumo\AddisAbaba.net.xml"/>
+        <route-files value="D:\Hilcoe\4th3rd\Senior_Project\Traffic_Management_System\traffic-flow-beacon-dashboard\traffic-flow-beacon-dashboard\AddisAbabaSumo\routes.xml"/>
+    </input>
+    <time>
+        <begin value="0"/>
+        <end value="10800"/>
+        <step-length value="1.0"/>
+    </time>
+    <traci_server>
+        <remote-port value="8813"/>
+    </traci_server>
+    <processing>
+        <ignore-route-errors value="true"/>
+    </processing>
+    <gui_only>
+        <start value="true"/>
+    </gui_only>
+</configuration>

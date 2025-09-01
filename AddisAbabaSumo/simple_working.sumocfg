@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://sumo.dlr.de/xsd/sumoConfiguration.xsd">
+    
+    <!-- Use simple test network instead of the large AddisAbaba network -->
+    <input>
+        <net-file value="simple_test_network.net.xml"/>
+        <route-files value="simple_test_routes.xml"/>
+    </input>
+    
+    <!-- Time settings -->
+    <time>
+        <begin value="0"/>
+        <end value="3600"/>
+        <step-length value="1.0"/>
+    </time>
+    
+    <!-- TraCI server configuration -->
+    <traci_server>
+        <remote-port value="8813"/>
+    </traci_server>
+    
+    <!-- Processing settings -->
+    <processing>
+        <ignore-route-errors value="true"/>
+        <collision.check-junctions value="true"/>
+        <time-to-teleport value="300"/>
+    </processing>
+    
+    <!-- GUI settings -->
+    <gui_only>
+        <start value="false"/>
+        <quit-on-end value="false"/>
+        <delay value="100"/>
+    </gui_only>
+    
+    <!-- Minimal reporting -->
+    <report>
+        <verbose value="false"/>
+        <no-step-log value="true"/>
+    </report>
+    
+</configuration>

@@ -1,0 +1,180 @@
+version: '3.8'
+
+services:
+  # Frontend service
+  frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: production
+      args:
+        - VITE_API_BASE_URL=${FRONTEND_API_BASE_URL:-http://localhost:3001/api}
+        - VITE_WEBSOCKET_URL=${FRONTEND_WEBSOCKET_URL:-ws://localhost:3001/ws}
+        - VITE_MAP_DEFAULT_ZOOM=${MAP_DEFAULT_ZOOM:-13}
+        - VITE_MAP_DEFAULT_LAT=${MAP_DEFAULT_LAT:-9.0331}
+        - VITE_MAP_DEFAULT_LNG=${MAP_DEFAULT_LNG:-38.7500}
+        - VITE_ENABLE_DEBUG_LOGGING=${ENABLE_DEBUG_LOGGING:-false}
+        - VITE_MOCK_DATA_MODE=${MOCK_DATA_MODE:-false}
+        - VITE_ENABLE_EMERGENCY_VEHICLES=${ENABLE_EMERGENCY_VEHICLES:-true}
+        - VITE_ENABLE_TRAFFIC_LIGHT_CONTROL=${ENABLE_TRAFFIC_LIGHT_CONTROL:-true}
+        - VITE_ENABLE_ANALYTICS=${ENABLE_ANALYTICS:-true}
+    container_name: sumo-frontend
+    ports:
+      - "${FRONTEND_PORT:-80}:80"
+    depends_on:
+      - backend
+    networks:
+      - app-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+
+  # Backend service
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+      target: production
+    container_name: sumo-backend
+    ports:
+      - "${BACKEND_PORT:-3001}:3001"
+    environment:
+      - NODE_ENV=production
+      - SERVER_PORT=3001
+      - WEBSOCKET_PORT=3002
+      - PYTHON_BRIDGE_HOST=python-bridge
+      - PYTHON_BRIDGE_PORT=8814
+      - SUMO_HOST=${SUMO_HOST:-sumo}
+      - SUMO_PORT=${SUMO_PORT:-8813}
+      - SUMO_UPDATE_INTERVAL=${SUMO_UPDATE_INTERVAL:-1000}
+      - MAX_VEHICLES_TRACKED=${MAX_VEHICLES_TRACKED:-1000}
+      - LOG_LEVEL=${LOG_LEVEL:-info}
+      - CORS_ORIGINS=${CORS_ORIGINS:-http://localhost}
+    depends_on:
+      - python-bridge
+    networks:
+      - app-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "node", "-e", "require('http').get('http://localhost:3001/health', (res) => { process.exit(res.statusCode === 200 ? 0 : 1) })"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+    volumes:
+      - backend-logs:/app/logs
+
+  # Python Bridge service
+  python-bridge:
+    build:
+      context: ./backend/python-bridge
+      dockerfile: Dockerfile
+    container_name: sumo-python-bridge
+    ports:
+      - "${PYTHON_BRIDGE_PORT:-8814}:8814"
+    environment:
+      - SUMO_HOST=${SUMO_HOST:-sumo}
+      - SUMO_PORT=${SUMO_PORT:-8813}
+      - API_PORT=8814
+      - FLASK_ENV=production
+    networks:
+      - app-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8814/health')"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+
+  # SUMO Simulation (optional - for development/demo)
+  sumo:
+    image: eclipse/sumo:latest
+    container_name: sumo-simulation
+    ports:
+      - "${SUMO_PORT:-8813}:8813"
+    volumes:
+      - ./AddisAbabaSumo:/data
+    working_dir: /data
+    command: >
+      sumo -c AddisAbaba.sumocfg 
+      --remote-port 8813 
+      --start 
+      --step-length 1.0 
+      --collision.action warn 
+      --time-to-teleport 300
+      --verbose
+    networks:
+      - app-network
+    restart: unless-stopped
+    profiles:
+      - with-sumo  # Use this profile to include SUMO
+
+  # Redis for caching and session storage (optional)
+  redis:
+    image: redis:7-alpine
+    container_name: sumo-redis
+    ports:
+      - "${REDIS_PORT:-6379}:6379"
+    networks:
+      - app-network
+    restart: unless-stopped
+    volumes:
+      - redis-data:/data
+    command: redis-server --appendonly yes --maxmemory 256mb --maxmemory-policy allkeys-lru
+    profiles:
+      - with-redis
+
+  # Monitoring with Prometheus (optional)
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: sumo-prometheus
+    ports:
+      - "${PROMETHEUS_PORT:-9090}:9090"
+    volumes:
+      - ./monitoring/prometheus.yml:/etc/prometheus/prometheus.yml
+      - prometheus-data:/prometheus
+    networks:
+      - app-network
+    restart: unless-stopped
+    profiles:
+      - monitoring
+
+  # Grafana for dashboards (optional)
+  grafana:
+    image: grafana/grafana:latest
+    container_name: sumo-grafana
+    ports:
+      - "${GRAFANA_PORT:-3000}:3000"
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=${GRAFANA_PASSWORD:-admin}
+    volumes:
+      - grafana-data:/var/lib/grafana
+      - ./monitoring/grafana/dashboards:/etc/grafana/provisioning/dashboards
+      - ./monitoring/grafana/datasources:/etc/grafana/provisioning/datasources
+    networks:
+      - app-network
+    restart: unless-stopped
+    depends_on:
+      - prometheus
+    profiles:
+      - monitoring
+
+networks:
+  app-network:
+    driver: bridge
+    name: sumo-traffic-network
+
+volumes:
+  backend-logs:
+    name: sumo-backend-logs
+  redis-data:
+    name: sumo-redis-data
+  prometheus-data:
+    name: sumo-prometheus-data
+  grafana-data:
+    name: sumo-grafana-data

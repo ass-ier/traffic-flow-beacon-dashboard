@@ -1,0 +1,2 @@
+Error: Error occurred: bad allocation while parsing 'AddisAbabaSumo/AddisAbaba.net.xml'
+Quitting (on error).

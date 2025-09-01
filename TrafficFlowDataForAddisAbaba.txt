@@ -1,0 +1,27 @@
+Appendix A – Traffic Flow Data for Addis Ababa Intersections
+
+A.1 Major Signalized Intersections
+Intersection NameEstimated Peak Flow (vehicles/hour/approach)Average Delay (seconds/vehicle)Level of Service (LOS)Additional DetailsData Source / BasisMeskel Square1,400 – 1,800> 400F4-leg intersection; heavy pedestrian crossing; multi-laneAAU Thesis, Manual Counts, VISSIM SimulationsJacros~1,500+431FPart of Ras Mekonnen corridor; high volume heavy vehiclesRas Mekonnen Corridor StudyLebu~1,500+126F3-leg intersection; includes bus stopsRas Mekonnen Corridor StudyImperial~1,500+710F4-leg, signalized; known for long queuesRas Mekonnen Corridor StudySaris Abo1,200 – 1,400Not specifiedFClose to Bole Subcity; includes pedestrian phasesManual counts, VISSIM modelingMegenagna (Lamberat)1,300 – 1,500Not specifiedF4-leg with bus terminal proximityTravel time & economic impact studyBole Medhanealem~1,400300 – 450FMajor commercial area; multiple bus linesField observation, traffic studiesAyat~1,200350FIntersection with commercial and residential influenceAAU Thesis and traffic flow reportsGofa Sefer (Ethio China)~1,100 – 1,300200 – 350E – FImportant residential & commercial feeder corridorAddis Ababa Transport Office reports
+A.2 Secondary and Minor Intersections (Estimated / Inferred)
+Intersection NameEstimated Peak Flow (vehicles/hour/approach)Average Delay (seconds/vehicle)Level of Service (LOS)Notes / Basis of EstimateMoyale–Mexico Street~1,200300 – 400E – FCorridor feeding flows, mid-block countsTersebi–Torhayloch1,100 – 1,300350 – 450E – FBased on 2011–2020 corridor studiesUrael–Atlas1,275 – 1,528 (directional)Not applicableN/AMidblock volume countsHaihulet–Wuhalemat~1,158 (directional)Not applicableN/AMidblock volume countsGerji–Coptic Intersection~900 – 1,100150 – 250D – EResidential and minor commercial area; assumed moderate flowSaris Abo Extension (side streets)~700 – 1,000100 – 200D – EEstimated from minor feeder trafficKera~1,000200 – 300EBus corridor, with intermittent pedestrian volumesAtlas~1,200250 – 350EMajor arterial feederSaris Abo (Secondary legs)~900300 – 400E – FBased on simulation extrapolation
+
+
+
+A.3 Typical Traffic Parameters for Simulation Input
+ParameterRecommended ValueExplanation / SourceDesign Hour Volume (DHV)1,100 – 1,800 vehicles/hour per approachBased on peak flow studies and manual countsSaturation Flow Rate~1,800 vehicles/hour per laneTypical urban arterial lane capacitySignal Cycle Length90 – 180 secondsVaries by intersection and demandGreen Time per Phase15 – 60 secondsDepends on phase type (through, left turn, pedestrian)Peak Period DurationMorning: 7:00 – 9:00 AM; Evening: 4:30 – 7:00 PMTime window for simulation calibrationPeak Hour Factor (K-Factor)0.10 – 0.15Fraction of daily flow during peak hourVehicle Composition70% Passenger Cars, 20% Minibuses, 10% TrucksReflects Addis Ababa mixed traffic compositionAverage Vehicle Length4.5 mFor saturation flow and queue length calculationsPedestrian VolumeUp to 20% of total crossing volumeParticularly at major commercial intersections
+
+
+
+
+A.4 Intersection Characteristics and Notes
+* Oversaturation: Most major intersections operate at LOS F during peak hours, with delays up to 700+ seconds per vehicle.
+* Pedestrian Influence: Intersections like Meskel Square and Bole Medhanealem have significant pedestrian volumes, affecting signal timing.
+* Bus Stops: Many intersections have bus stops close to intersections, impacting approach saturation flow and queue lengths.
+* Geometry: Typical intersections have 3 to 4 legs, with 2-3 lanes per approach; some intersections have dedicated turn lanes.
+* Signal Control Types: Most intersections use fixed-time signals, with some locations experimenting with actuated signals.
+* Traffic Composition: High percentage of minibuses and trucks compared to developed countries, affecting saturation flow rates and acceleration profiles.
+* Non-Motorized Traffic: Minimal but important to include for pedestrian clearance times in signal cycles.
+A.5 Data Sources and References
+SourceDescriptionAddis Ababa University (AAU) Traffic Engineering ThesesManual traffic counts, delay measurementsMinistry of Transport and Addis Ababa Transport Bureau ReportsCorridor traffic volumes and LOS analysisPublished VISSIM & SIDRA Simulations on Addis Ababa intersectionsTraffic micro-simulation and signal optimizationResearch articles and conference papers on Addis Ababa traffic congestionField surveys and modeling insightsInternational Traffic Engineering Texts (for saturation flow, K-factor, cycle length norms)
+A.6 Summary Table for Simulation Implementation
+Intersection / CorridorPeak Flow (vph/approach)LOSAvg Delay (sec)NotesMeskel Square1,400 – 1,800F400+Heavy pedestrian & vehicle mixJacros~1,500+F431Ras Mekonnen CorridorLebu~1,500+F126Ras Mekonnen CorridorImperial~1,500+F710Long queuesSaris Abo1,200 – 1,400FN/AManual countsMegenagna (Lamberat)1,300 – 1,500FN/AEconomic impactBole Medhanealem~1,400F300 – 450Commercial hubMoyale–Mexico Street~1,200E–F300 – 400Midblock corridor estimateTersebi–Torhayloch1,100 – 1,300E–F350 – 450Corridor historic dataGerji–Coptic900 – 1,100D–E150 – 250Residential feeder

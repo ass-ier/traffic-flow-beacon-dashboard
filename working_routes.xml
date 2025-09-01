@@ -1,0 +1,39 @@
+<?xml version='1.0' encoding='utf-8'?>
+<routes xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://sumo.dlr.de/xsd/routes_file.xsd">
+    <vType id="car" accel="2.6" decel="4.5" sigma="0.5" length="5" maxSpeed="50.0" />
+    <vType id="bus" accel="1.2" decel="4.0" sigma="0.5" length="12" maxSpeed="30.0" />
+    <vType id="truck" accel="1.0" decel="4.0" sigma="0.5" length="8" maxSpeed="25.0" />
+    <route id="single_edge_1" edges="1006330615#0" />
+    <route id="single_edge_2" edges="1008288320" />
+    <route id="single_edge_3" edges="1010492351#0" />
+    <route id="single_edge_4" edges="1010492351#3" />
+    <route id="single_edge_5" edges="1010492352" />
+    <route id="two_edge_1" edges="1006330615#0 1008288320" />
+    <route id="two_edge_2" edges="1008288320 1010492351#0" />
+    <route id="two_edge_3" edges="1010492351#0 1010492351#3" />
+    <route id="two_edge_4" edges="1010492351#3 1010492352" />
+    <route id="two_edge_5" edges="1010492352 101558947#0" />
+    <vehicle id="vehicle_1" type="car" route="single_edge_1" depart="5" />
+    <vehicle id="vehicle_2" type="bus" route="single_edge_1" depart="10" />
+    <vehicle id="vehicle_3" type="truck" route="single_edge_1" depart="15" />
+    <vehicle id="vehicle_4" type="car" route="single_edge_2" depart="20" />
+    <vehicle id="vehicle_5" type="bus" route="single_edge_2" depart="25" />
+    <vehicle id="vehicle_6" type="truck" route="single_edge_2" depart="30" />
+    <vehicle id="vehicle_7" type="car" route="single_edge_3" depart="35" />
+    <vehicle id="vehicle_8" type="bus" route="single_edge_3" depart="40" />
+    <vehicle id="vehicle_9" type="truck" route="single_edge_3" depart="45" />
+    <vehicle id="vehicle_10" type="car" route="single_edge_4" depart="50" />
+    <vehicle id="vehicle_11" type="bus" route="single_edge_4" depart="55" />
+    <vehicle id="vehicle_12" type="truck" route="single_edge_4" depart="60" />
+    <vehicle id="vehicle_13" type="car" route="single_edge_5" depart="65" />
+    <vehicle id="vehicle_14" type="bus" route="single_edge_5" depart="70" />
+    <vehicle id="vehicle_15" type="truck" route="single_edge_5" depart="75" />
+    <vehicle id="vehicle_16" type="car" route="two_edge_1" depart="80" />
+    <vehicle id="vehicle_17" type="bus" route="two_edge_1" depart="85" />
+    <vehicle id="vehicle_18" type="truck" route="two_edge_1" depart="90" />
+    <vehicle id="vehicle_19" type="car" route="two_edge_2" depart="95" />
+    <vehicle id="vehicle_20" type="bus" route="two_edge_2" depart="100" />
+    <flow id="flow_1" type="car" route="single_edge_1" begin="0" end="3600" vehsPerHour="50" />
+    <flow id="flow_2" type="car" route="single_edge_2" begin="0" end="3600" vehsPerHour="60" />
+    <flow id="flow_3" type="car" route="single_edge_3" begin="0" end="3600" vehsPerHour="70" />
+</routes>

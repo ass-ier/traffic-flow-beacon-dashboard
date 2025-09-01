@@ -10,35 +10,76 @@ import {
   MapPin,
   Timer
 } from 'lucide-react';
-import { useEffect, useState } from 'react';
+import { useSUMOData } from '../hooks/useSUMOData';
+import { useMemo } from 'react';
 
 export const StatisticsPanel = () => {
-  const [stats, setStats] = useState({
-    totalVehicles: 142,
-    avgWaitTime: 23.5,
-    throughput: 156,
-    activeIntersections: 4,
-    queueLengths: [12, 8, 15, 5],
-    congestionLevel: 67,
-    systemEfficiency: 85
-  });
+  // Get real SUMO data
+  const {
+    vehicles,
+    intersections,
+    roads,
+    emergencyVehicles,
+    connection,
+    loading,
+    error,
+  } = useSUMOData();
 
-  // Simulate real-time updates
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setStats(prev => ({
-        ...prev,
-        totalVehicles: prev.totalVehicles + Math.floor((Math.random() - 0.5) * 10),
-        avgWaitTime: Math.max(0, prev.avgWaitTime + (Math.random() - 0.5) * 5),
-        throughput: prev.throughput + Math.floor((Math.random() - 0.5) * 20),
-        queueLengths: prev.queueLengths.map(q => Math.max(0, q + Math.floor((Math.random() - 0.5) * 6))),
-        congestionLevel: Math.max(0, Math.min(100, prev.congestionLevel + Math.floor((Math.random() - 0.5) * 10))),
-        systemEfficiency: Math.max(0, Math.min(100, prev.systemEfficiency + Math.floor((Math.random() - 0.5) * 5)))
-      }));
-    }, 3000);
-
-    return () => clearInterval(interval);
-  }, []);
+  // Calculate real-time statistics from SUMO data
+  const stats = useMemo(() => {
+    const totalVehicles = vehicles.length + emergencyVehicles.length;
+    
+    // Calculate average waiting time from vehicles
+    const avgWaitTime = vehicles.length > 0 
+      ? vehicles.reduce((sum, v) => sum + (v.waitingTime || 0), 0) / vehicles.length
+      : 0;
+    
+    // Calculate throughput based on vehicle speeds
+    const throughput = vehicles.length > 0
+      ? Math.round(vehicles.reduce((sum, v) => sum + Math.max(0, v.speed), 0) * 3.6) // Convert to vehicles/hour estimate
+      : 0;
+    
+    // Get queue lengths from intersections
+    const queueLengths = intersections.slice(0, 4).map(intersection => {
+      const queues = Object.values(intersection.queueLengths || {});
+      return queues.length > 0 ? Math.max(...queues) : 0;
+    });
+    
+    // Pad queue lengths if we have fewer than 4 intersections
+    while (queueLengths.length < 4) {
+      queueLengths.push(0);
+    }
+    
+    // Calculate congestion level based on roads
+    let congestionLevel = 0;
+    if (roads.length > 0) {
+      const highCongestionRoads = roads.filter(r => r.congestionLevel === 'high').length;
+      const mediumCongestionRoads = roads.filter(r => r.congestionLevel === 'medium').length;
+      congestionLevel = Math.round(
+        (highCongestionRoads * 100 + mediumCongestionRoads * 50) / roads.length
+      );
+    }
+    
+    // Calculate system efficiency based on average speeds and waiting times
+    let systemEfficiency = 85; // Default
+    if (vehicles.length > 0) {
+      const avgSpeed = vehicles.reduce((sum, v) => sum + v.speed, 0) / vehicles.length;
+      const maxSpeed = 50; // Assume max speed of 50 km/h
+      const speedEfficiency = (avgSpeed / maxSpeed) * 100;
+      const waitEfficiency = Math.max(0, 100 - avgWaitTime * 2); // Penalize waiting time
+      systemEfficiency = Math.round((speedEfficiency + waitEfficiency) / 2);
+    }
+    
+    return {
+      totalVehicles,
+      avgWaitTime,
+      throughput,
+      activeIntersections: intersections.length,
+      queueLengths,
+      congestionLevel: Math.min(100, congestionLevel),
+      systemEfficiency: Math.max(0, Math.min(100, systemEfficiency))
+    };
+  }, [vehicles, intersections, roads, emergencyVehicles]);
 
   const getCongestionBadge = (level: number) => {
     if (level < 30) return <Badge className="bg-green-500">Low</Badge>;
@@ -47,11 +88,21 @@ export const StatisticsPanel = () => {
   };
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle className="flex items-center space-x-2">
-          <BarChart3 className="h-5 w-5" />
-          <span>Traffic Statistics</span>
+    <Card className="bg-gradient-to-br from-white to-slate-50/50 border-0 shadow-xl backdrop-blur-sm hover-lift">
+      <CardHeader className="pb-4">
+        <CardTitle className="flex items-center justify-between">
+          <div className="flex items-center space-x-3">
+            <div className="w-8 h-8 bg-gradient-to-r from-purple-600 to-pink-600 rounded-lg flex items-center justify-center">
+              <BarChart3 className="h-4 w-4 text-white" />
+            </div>
+            <span className="text-lg font-semibold bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent">
+              Live Analytics
+            </span>
+          </div>
+          <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200">
+            <div className="w-2 h-2 bg-green-500 rounded-full mr-2 animate-pulse"></div>
+            Real-time
+          </Badge>
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">

@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://sumo.dlr.de/xsd/sumoConfiguration.xsd">
+    
+    <!-- Use working routes file instead of the large routes.xml -->
+    <input>
+        <net-file value="AddisAbaba.net.xml"/>
+        <route-files value="../working_routes.xml"/>
+    </input>
+    
+    <!-- Extended simulation time -->
+    <time>
+        <begin value="0"/>
+        <end value="7200"/>
+        <step-length value="1.0"/>
+    </time>
+    
+    <!-- TraCI server configuration -->
+    <traci_server>
+        <remote-port value="8813"/>
+    </traci_server>
+    
+    <!-- Processing settings optimized for TraCI -->
+    <processing>
+        <ignore-route-errors value="true"/>
+        <max-depart-delay value="1800"/>
+        <eager-insert value="true"/>
+        <time-to-teleport value="600"/>
+        <collision.check-junctions value="true"/>
+        <collision.action value="warn"/>
+    </processing>
+    
+    <!-- GUI settings for manual control -->
+    <gui_only>
+        <start value="false"/>
+        <quit-on-end value="false"/>
+        <delay value="100"/>
+    </gui_only>
+    
+    <!-- Minimal reporting for performance -->
+    <report>
+        <verbose value="false"/>
+        <no-step-log value="true"/>
+        <no-warnings value="false"/>
+    </report>
+    
+</configuration>

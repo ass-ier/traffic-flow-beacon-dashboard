@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+    <input>
+        <net-file value="AddisAbaba.net.xml"/>
+    </input>
+    <time>
+        <begin value="0"/>
+        <end value="3600"/>
+    </time>
+    <traci_server>
+        <remote-port value="8813"/>
+    </traci_server>
+</configuration>

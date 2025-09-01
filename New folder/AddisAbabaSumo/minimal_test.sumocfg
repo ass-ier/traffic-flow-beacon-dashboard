@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+    <input>
+        <net-file value="AddisAbaba.net.xml"/>
+        <route-files value="minimal_test.rou.xml"/>
+    </input>
+    <time>
+        <begin value="0"/>
+        <end value="300"/>
+        <step-length value="1.0"/>
+    </time>
+    <traci_server>
+        <remote-port value="8813"/>
+    </traci_server>
+    <processing>
+        <ignore-route-errors value="true"/>
+    </processing>
+</configuration>
